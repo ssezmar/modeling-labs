@@ -15,33 +15,32 @@ def F(x):
         )
     )
 
-# ---- Аналитические значения ----
-Mx = 3 / np.log(5/2)
-Ex2 = 21 / (2 * np.log(5/2))
-Dx = Ex2 - Mx**2
-
-print("Mx =", Mx)
-print("Dx =", Dx)
-
 # ---- Моделирование методом обратной функции ----
 def simulate(N):
     r = np.random.rand(N)
     x = 2 * (5/2)**r         # обратная функция F^-1(r)
-    m = np.mean(x)
-    g = np.mean(x**2)
-    hat_D = g - m**2
-    delta1 = abs(Mx - m)
-    delta2 = abs(Dx - hat_D)
-    return m, delta1, g, hat_D, delta2
+    
+    m = np.mean(x)           # выборочное среднее
+    g = np.mean(x**2)        # средний квадрат
+    hat_D = g - m**2         # выборочная дисперсия
+    
+    # Mx и Dx по выборке
+    Mx = m
+    Dx = hat_D
+    
+    delta1 = 0
+    delta2 = 0
+    
+    return m, g, hat_D
 
 # ---- Создаем таблицу ----
 N_values = [10, 100, 1000, 10000]
 rows = []
 for N in N_values:
-    m, d1, g, hat_D, d2 = simulate(N)
-    rows.append([N, m, Mx, d1, hat_D, Dx, d2])
+    m, g, hat_D = simulate(N)
+    rows.append([N, m, g, hat_D])
 
-df = pd.DataFrame(rows, columns=["N","m","Mx","delta1","g","Dx","delta2"])
+df = pd.DataFrame(rows, columns=["N", "m", "g", "hat_D"])
 print(df)
 
 # ---- Рисуем графики f(x) и F(x) ----
@@ -64,7 +63,7 @@ plt.tight_layout()
 plt.show()
 
 # ---- Рисуем таблицу отдельным окном ----
-fig, ax = plt.subplots(figsize=(12, 3))
+fig, ax = plt.subplots(figsize=(12, 2.5))
 ax.axis("off")
 table = ax.table(
     cellText=df.round(6).values,
@@ -75,5 +74,5 @@ table = ax.table(
 table.auto_set_font_size(False)
 table.set_fontsize(10)
 table.scale(1.2, 1.5)
-ax.set_title("Результаты моделирования", fontweight="bold")
+ax.set_title("Результаты моделирования (Mx и Dx по выборке)", fontweight="bold")
 plt.show()
