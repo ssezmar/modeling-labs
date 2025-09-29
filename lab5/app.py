@@ -5,33 +5,38 @@ import streamlit as st
 # ====== Настройки страницы ======
 st.set_page_config(page_title="Нормальное распределение", layout="centered")
 st.markdown(
-    "<h1 style='text-align: center; color: #4C78A8;'>📈 Нормальное распределение</h1>",
+    "<h1 style='text-align: center; color: #4C78A8;'>📊 Нормальное распределение</h1>",
     unsafe_allow_html=True
 )
 
-# ====== Стили для маленьких инпутов ======
+# ====== Стили для маленьких инпутов без стрелок ======
 st.markdown("""
 <style>
+/* Уменьшаем ширину инпутов */
 input[type=number] {
     width: 90px !important;
 }
+
+/* Прячем стрелочки для Chrome, Safari, Edge */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+/* Прячем стрелочки для Firefox */
 input[type=number] {
     -moz-appearance: textfield;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ====== Инпуты (μ, σ, N) ======
+# ====== Инпуты в одну строку с placeholder ======
 col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
-    mu = st.number_input("", value=0.0, step=0.1, format="%.4f", placeholder="μ")
+    mu = st.number_input("", value=0.0, step=0.1, format="%.4f", placeholder="μ (среднее)")
 with col2:
-    sigma = st.number_input("", value=1.0, step=0.1, min_value=0.0001, format="%.4f", placeholder="σ")
+    sigma = st.number_input("", value=1.0, step=0.1, min_value=0.0001, format="%.4f", placeholder="σ (ст. откл.)")
 with col3:
     N = st.number_input("", value=100, min_value=1, step=1, placeholder="N")
 
@@ -40,7 +45,7 @@ if sigma <= 0:
     st.error("❌ σ должно быть > 0")
 else:
     # ====== Генерация выборки ======
-    samples = [random.gauss(mu, sigma) for _ in range(N)]
+    samples = [random.normalvariate(mu, sigma) for _ in range(N)]
 
     # Теоретические значения
     Mx = mu
@@ -54,7 +59,7 @@ else:
     delta_m = abs(m - Mx)
     delta_g = abs(Dx - Dx_theor)
 
-    # ====== Вывод Δ1 и Δ2 ======
+    # ====== Вывод Δ1 и Δ2 в одну строку ======
     st.markdown("---")
     c1, c2 = st.columns(2)
     with c1:
@@ -124,7 +129,7 @@ else:
         <tr>
     """
 
-    # Заголовки
+    # Заголовки столбцов
     for j in range(5):
         table_html += f"<th>Колонка {j+1}</th>"
     table_html += "</tr>"
